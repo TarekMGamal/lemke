@@ -1,8 +1,8 @@
 # LCP solver
 
 import sys
-import fractions 
 import math # gcd
+from flint import fmpz, fmpq
 
 from . import columnprint
 from . import utils
@@ -138,17 +138,17 @@ class tableau:
     def __init__(self, Mqd): 
         self.n = Mqd.n
         n = self.n
-        self.scalefactor = [0]*(n+2) # 0 for z0, n+1 for RHS
+        self.scalefactor = [fmpz(0)]*(n+2) # 0 for z0, n+1 for RHS
         # A = tableau, long integer entries
         # self.A = np.zeros( (n,n+2), dtype=object)
         self.A = [[]]*n 
         for i in range(n):
-            self.A[i]=[0]*(n+2)
-        self.determinant = 1
+            self.A[i]=[fmpz(0)]*(n+2)
+        self.determinant = fmpz(1)
         self.lextested = [0]*(n+1)
         self.lexcomparisons = [0]*(n+1)
         self.pivotcount = 0
-        self.solution = [fractions.Fraction(0)]*(2*n+1) # all vars
+        self.solution = [fmpq(0)]*(2*n+1) # all vars
         # variable encodings: VARS = 0..2n = Z(0) .. Z(n) W(1) .. W(n)
         # tableau columns: RHS n+1
         # bascobas[v] in 0..n-1: basic,   bascobas[v]   = tableau row
@@ -174,7 +174,7 @@ class tableau:
                     den = Mqd.M[i][j-1].denominator
                 # least common multiple
                 factor *= den // math.gcd(factor,den)
-            self.scalefactor[j] = factor
+            self.scalefactor[j] = fmpz(factor)
             # fill in column j of A
             for i in range(n):
                 if j==0:
@@ -186,8 +186,8 @@ class tableau:
                 else:
                     den = Mqd.M[i][j-1].denominator
                     num = Mqd.M[i][j-1].numerator
-                self.A[i][j] = (factor//den) * num 
-            self.determinant = -1
+                self.A[i][j] = fmpz((factor//den) * num) 
+            self.determinant = fmpz(-1)
         return
 
     def __str__(self):
@@ -234,11 +234,11 @@ class tableau:
                 # value of  Z(i):   scfa[Z(i)]*rhs[row] / (scfa[RHS]*det)    
                 # value of  W(i-n): rhs[row] / (scfa[RHS]*det)    
                 if i <= n: # computing Z(i)
-                    num *= self.scalefactor[i] 
-                self.solution[i] = fractions.Fraction(num,
+                    num *= self.scalefactor[i]
+                self.solution[i] = fmpq(num,
                     self.determinant*self.scalefactor[n+1])
             else: # i is nonbasic
-                self.solution[i]=fractions.Fraction(0)
+                self.solution[i]=fmpq(0)
    
     def outsol(self): # string giving solution, after createsol()
         # printout in columns to check complementarity
