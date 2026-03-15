@@ -45,7 +45,8 @@ options: -v, -verbose : printout intermediate tableaus
     return
 
 def printout(*s):
-    print(*s, file=filehandle) 
+    #print(*s, file=filehandle) 
+    pass
 
 # LCP data M,q,d
 class lcp: 
