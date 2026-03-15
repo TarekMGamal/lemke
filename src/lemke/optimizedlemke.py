@@ -3,6 +3,7 @@
 import sys
 import math # gcd
 from flint import fmpz, fmpq
+import fractions
 
 from . import columnprint
 from . import utils
@@ -235,10 +236,10 @@ class tableau:
                 # value of  W(i-n): rhs[row] / (scfa[RHS]*det)    
                 if i <= n: # computing Z(i)
                     num *= self.scalefactor[i]
-                self.solution[i] = fmpq(num,
-                    self.determinant*self.scalefactor[n+1])
+                self.solution[i] = fractions.Fraction(int(num),
+                    int(self.determinant*self.scalefactor[n+1]))
             else: # i is nonbasic
-                self.solution[i]=fmpq(0)
+                self.solution[i]=fractions.Fraction(0)
    
     def outsol(self): # string giving solution, after createsol()
         # printout in columns to check complementarity
